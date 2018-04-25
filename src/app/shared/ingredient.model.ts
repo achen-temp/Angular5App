@@ -1,5 +1,10 @@
 export class Ingredient {
 
-	constructor(public name: string, public amount: number){}
-	//auto create field name and amount and assign to constructor
+	public name: string;
+	public amount: number;
+
+	constructor(name: string, amount: number){
+		this.name = name;
+		this.amount = amount;
+	}
 }

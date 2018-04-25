@@ -1,22 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component, OnDestroy,
+  OnInit
+} from '@angular/core';
+
 import { Recipe } from '../recipe.model';
+import { RecipeService} from '../recipe.service';
+import {ActivatedRoute, Router} from "@angular/router";
+import {Subscription} from "rxjs/Subscription";
 
 @Component({
   selector: 'app-recipe-list',
   templateUrl: './recipe-list.component.html',
-  styleUrls: ['./recipe-list.component.css']
+  styleUrls: ['./recipe-list.component.css'],
+  providers: []
 })
-export class RecipeListComponent implements OnInit {
+export class RecipeListComponent implements OnInit, OnDestroy {
 
-  recipes: Recipe[] = [
-  	 new Recipe('A Test Recipe', 'This is test description', 'https://static01.nyt.com/images/2015/08/14/dining/14ROASTEDSALMON/14ROASTEDSALMON-articleLarge.jpg');
+  recipes: Recipe[];
 
-  	 new Recipe('2 Test Recipe', '2This is test description', 'https://static01.nyt.com/images/2015/08/14/dining/14ROASTEDSALMON/14ROASTEDSALMON-articleLarge.jpg');
-  ];
+  subscription: Subscription = new Subscription();
 
-  constructor() { }
+  constructor(private recipeService: RecipeService,
+              private router: Router,
+              private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.recipes = this.recipeService.getRecipes();
+    this.subscription = this.recipeService.recipesChanged.subscribe(
+      (changedRecipes : Recipe[]) => {
+        this.recipes = changedRecipes;
+      }
+    )
+  }
+
+  //relative router should given relativeTo param and assign current route
+  onNewRecipe(){
+    this.router.navigate(['new'], {relativeTo: this.route});
+  }
+
+  ngOnDestroy(){
+    this.subscription.unsubscribe();
   }
 
 }
